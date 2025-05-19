@@ -3,10 +3,10 @@ import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 dotenv.config();
 
-export async function createTenant(tenantId: string) {
+export const createTenant= async(tenantId: string) => {
     await registeryPool.query(`CREATE DATABASE IF NOT EXISTS \`${tenantId}\`;`);
 
-    const pool = mysql.createPool({
+    return mysql.createPool({
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
         port: Number(process.env.DB_PORT || 3306),
@@ -15,5 +15,4 @@ export async function createTenant(tenantId: string) {
         waitForConnections: true,
         connectionLimit: 10,
     });
-    return pool;
 };
