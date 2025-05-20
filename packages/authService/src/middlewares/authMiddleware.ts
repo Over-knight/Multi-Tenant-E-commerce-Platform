@@ -23,7 +23,7 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
     const authHeader = req.headers.authorization;
     // if (authHeader && authHeader.startsWith("Bearer")) {
     // }
-    if (!authHeader || !authHeader.startsWith("Bearer")) {
+    if (!authHeader?.startsWith("Bearer")) {
         res.status(401).json({ message: "Not authorized, token missing"});
         return;
     }
@@ -38,14 +38,16 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
         // console.log("Decoded JWT:", decoded); //was used for testing
         const { tenantId, userId, role} = decoded;
         if (!tenantId || !userId || !role) {
-            throw new Error('Invalid token payload');
+            res.status(401).json({message:'Invalid token payload'});
+            return;
         }
         req.user = {tenantId, userId, role};
         req.dbPool = await createTenant(tenantId);
-        next(); 
-    } catch (error) {
+        return next(); 
+    } catch (error: any) {
         if (error instanceof TokenExpiredError) {
             res.status(401).json({ message: "Session expired, Please log in again" });
+            return;
         }
         console.error("JWT verification error:", error);
         res.status(401).json({ message: "Not authorized, token failed"});
