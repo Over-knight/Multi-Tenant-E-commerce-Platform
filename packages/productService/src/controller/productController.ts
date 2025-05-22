@@ -1,22 +1,28 @@
 import { Response } from 'express';
 import {
-  createProduct, listProducts, getProduct, updateProduct, deleteProduct
+  createProduct, 
+  listProducts, 
+  getProduct, 
+  updateProduct, 
+  deleteProduct
 } from '../services/productService';
 import type { Pool } from 'mysql2/promise';
 import { AuthRequest } from '../../../authService/src/middlewares/authMiddleware';;
 
 export const postProduct = async (req: AuthRequest, res: Response): Promise<void> => {
+  console.log('📝 postProduct called', req.body);
   try {
-    // const storeId = Number(req.body.storeId);
+    const storeId = Number(req.body.storeId);
     const pool = req.dbPool as Pool;
-    const { storeId, name, description, price, quantity, metadata } = req.body;
-    const productId = await createProduct(pool, Number(storeId), {
-        name,
-        description,
-        price,
-        quantity,
-        metadata,
-    });
+    // const { storeId, name, description, price, quantity, metadata } = req.body;
+    // const productId = await createProduct(pool, Number(req.body.storeId), {
+    //     name,
+    //     description,
+    //     price,
+    //     quantity,
+    //     metadata,
+    // });
+    const productId = await createProduct(pool, storeId, req.body);
     res.status(201).json({ productId});
   } catch (err: any) {
     res.status(500).json({ message: err.message });
